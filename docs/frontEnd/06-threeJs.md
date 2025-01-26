@@ -195,7 +195,11 @@ window.addEventListener("dblclick", () => {
 
 ② 编辑器 https://threejs.org/editor/
 
-## 四、物体
+## 四、相机
+
+## 五、灯光
+
+## 六、几何体
 
 ### 4.1 创建几何体
 
@@ -263,3 +267,7 @@ window.addEventListener("dblclick", () => {
   ```
 
 ### [4.3 常见几何体](https://threejs.org/docs/index.html#api/zh/geometries/BoxGeometry)
+
+## 七、材质
+
+## 八、贴图
