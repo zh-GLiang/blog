@@ -32,7 +32,9 @@ Three.js 是一个开源的应用级 3D JavaScript 库，可以让开发者在�
 npm install three@0.172.0 --save
 ```
 
-### 2.2 初始化
+### 2.2 基本流程
+
+创建场景 → 添加物体 → 设置相机 → 循环渲染
 
 #### 2.2.1创建一个场景
 
@@ -89,7 +91,7 @@ const cube = new THREE.Mesh(geometry, material)
 world.scene.add(cube)
 ```
 
-#### 2.2.3 渲染
+#### 2.2.3 设置相机位置循环渲染
 
 ```js
 // 设置相机位置
@@ -135,6 +137,16 @@ const cube = new THREE.Mesh(geometry, material);
 ```
 
 `Mesh`构造函数有两个参数：**几何**geometry和**材质**material
+
+### 2.4 坐标系
+
+坐标辅助器，红色为x轴，绿色为y轴，蓝色为z轴,[详见](https://threejs.org/docs/index.html#api/zh/helpers/ArrowHelper)
+
+```js
+// AxesHelper：辅助观察的坐标系，参数为坐标长度
+const axesHelper = new THREE.AxesHelper(150)
+scene.add(axesHelper)
+```
 
 ## 三、几何体与材质
 
@@ -185,6 +197,20 @@ const cube = new THREE.Mesh(geometry, material);
 
 #### 3.2.5 [着色器材质(ShaderMaterial)](https://threejs.org/docs/index.html#api/zh/materials/ShaderMaterial)
 
+#### 3.2.6 [纹理材质（Texture）](https://threejs.org/docs/index.html?q=Texture#api/zh/textures/Texture)
+
+#### 3.2.7 材质属性
+
+颜色（color）
+
+透明度（transparent）
+
+光照响应（lights）
+
+### 3.3 [三维物体操作](https://threejs.org/docs/index.html#api/zh/core/Object3D)
+
+旋转、缩放、位移、可见性、添加子对象、复制
+
 ## 四、光照与阴影
 
 ### 4.1 光源类型
@@ -207,105 +233,129 @@ const cube = new THREE.Mesh(geometry, material);
 
 ### 4.2 阴影
 
-渲染器启用阴影（renderer.shadowMap.enabled）
+① 渲染器启用阴影
+
+```js
+renderer.shadowMap.enabled = true// 开启阴影
+renderer.shadowMap.type = THREE.PCFSoftShadowMap// 使用软阴影
+```
+
+② 光源启用阴影
+
+```js
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 5);
+light.castShadow = true; // 启用光源投射阴影
+// 设置光源阴影参数
+light.shadow.mapSize.width = 1024; // 阴影贴图宽度
+light.shadow.mapSize.height = 1024; // 阴影贴图高度
+light.shadow.camera.near = 0.5; // 阴影相机近平面
+light.shadow.camera.far = 20; // 阴影相机远平面
+light.shadow.camera.left = -10; // 阴影相机左边界
+light.shadow.camera.right = 10; // 阴影相机右边界
+light.shadow.camera.top = 10; // 阴影相机上边界
+light.shadow.camera.bottom = -10; // 阴影相机下边界
+```
+
+③ 允许物体产生阴影
+
+```js
+const cube = () => {
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshPhysicalMaterial({
+    color: 0x00ff00,
+    reflectivity: 0.25,
+    sheenRoughness: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.03,
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(0, 1, 0);
+  cube.castShadow = true; // 允许立方体投射阴影
+  return cube
+}
+```
+
+④ 平面接收阴影
+
+```js
+const plane = () => {
+  const planeGeometry = new THREE.PlaneGeometry(20, 20);
+  const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotation.x = -Math.PI / 2; // 旋转平面使其水平
+  plane.receiveShadow = true; // 允许平面接收阴影
+  return plane
+}
+```
 
 ## 五、相机与控制
 
+### 5.1 相机类型
+
+#### 5.1.2 透视投影[PerspectiveCamera](https://threejs.org/docs/index.html#api/zh/cameras/PerspectiveCamera)
+
+模拟人眼所看到的景象
+
+#### 5.1.2 正交投影[OrthographicCamera](https://threejs.org/docs/index.html#api/zh/cameras/OrthographicCamera)
+
+常用于图纸蓝图
+
+### 5.2 相机控制
+
+按键绑定、方法详见[基类Controls](https://threejs.org/docs/index.html#api/zh/extras/Controls)
+
+#### 5.2.1 轨道控制器[OrbitControls](https://threejs.org/docs/index.html#examples/zh/controls/OrbitControls)
+
+#### 5.2.2 飞行控制器[FlyControls](https://threejs.org/docs/index.html#examples/zh/controls/FlyControls)
+
+- 允许用户像飞行器一样在场景中自由移动和旋转。
+- 支持前后、左右、上下移动，以及俯仰、偏航和滚转。
+- 适合用于飞行模拟或自由探索场景。
+- 按下 `W`、`A`、`S`、`D` 键可以前后左右移动。
+- 按下 `Q`、`E` 键可以上下移动。
+- 鼠标移动可以控制视角旋转。
+
+#### 5.2.3 第一人称控制器[FirstPersonControls](https://threejs.org/docs/index.html#examples/zh/controls/FirstPersonControls)
+
+- 模拟第一人称视角，类似于行走或观察场景。
+- 支持前后、左右移动，以及视角的上下左右旋转。
+- 适合用于第一人称游戏或步行模拟。
+- 按下 `W`、`A`、`S`、`D` 键可以前后左右移动。
+- 鼠标移动可以控制视角旋转。
+- 不支持上下移动（除非通过代码调整）。
+
 ## 六、动画与交互
+
+### 6.1 动画
+
+requestAnimationFrame
+
+更新物体属性（位置、旋转、缩放）
+
+使用 [Tween.js](https://createjs.com/tweenjs)，[GSAP.js](https://gsap.com/) 补间动画
+
+### 6.2 交互
+
+#### 6.2.1 [射线检测（Raycaster）](https://threejs.org/docs/index.html?q=Raycaster#api/zh/core/Raycaster)
+
+鼠标点击检测、物体拾取
+
+#### 6.2.2 事件监听
+
+鼠标事件（click, hover）
+
+键盘事件（keydown, keyup）
 
 ## 七、加载器与资源
 
+### 7.1 加载器
+
+### 7.2 资源
+
 ## 八、性能优化
 
-## 辅助器
-
-### 3.1 坐标辅助器
-
-坐标辅助器，红色为x轴，绿色为y轴，蓝色为z轴,[详见](https://threejs.org/docs/index.html#api/zh/helpers/ArrowHelper)
-
-```js
-// AxesHelper：辅助观察的坐标系，参数为坐标长度
-const axesHelper = new THREE.AxesHelper(150)
-scene.add(axesHelper)
-```
-
-### 3.2 轨道控制器
-
-轨道控制器，[详见](https://threejs.org/docs/index.html#examples/zh/controls/OrbitControls)
-
-```js
-// 导入轨道控制器
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-// 添加轨道控制器
-const controls = new OrbitControls(camera, renderer.domElement)
-// 设置带阻尼的惯性
-controls.enableDamping = true
-// 设置阻尼系数
-controls.dampingFactor = 0.05
-// 设置转动速度
-controls.autoRotate = true
-// 更新控制器。必须在摄像机的变换发生任何手动改变后调用
-controls.update()
-```
-
-### 3.2 几何体基本操作
-
-[详见](https://threejs.org/docs/index.html#api/zh/core/Object3D)
-
-① 物体位移与缩放
-
-```js
-// 创建网格
-const cube = new THREE.Mesh(geometry, material)
-// 几何体的位移
-// cube.position.y = 2
-cube.position.set(2, 0, 0)
-// 缩放
-cube.scale.set(2,2,2)
-```
-
-② 父子元素
-
-```js
-// 创建父元素
-const faCube = new THREE.Mesh(geometry, material)
-// 创建子元素
-const cube = new THREE.Mesh(geometry, material)
-// 将子元素添加到父元素中
-faCube.add(cube)
-// 将网格添加到场景中
-scene.add(faCube)
-```
-
-注意：子元素的坐标相对于父元素的坐标
-
-③ 物体旋转
-
-```js
-//直接设置旋转属性，例如围绕x轴旋转90度
-cube.rotation.x = -Math.PI/2
-//围绕x轴旋转45度
-cube.rotation.set(-Math.PI / 4, 0, 0, "XZY");
-```
-
 ### 3.3 屏幕自适应
-
-① 自适应屏幕大小
-
-```js
-// 监听画面变化，更新渲染画面
-window.addEventListener('resize', () => {
-  // 更新摄像头
-  camera.aspect = window.innerWidth / window.innerHeight
-  // 更新摄像机的投影矩阵
-  camera.updateProjectionMatrix()
-
-  // 更新渲染器
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  // 设置渲染器的像素比
-  renderer.setPixelRatio(window.devicePixelRatio)
-})
-```
 
 ②  控制场景全屏
 
@@ -328,10 +378,6 @@ window.addEventListener("dblclick", () => {
 ① 调试器 -gui：可以快速创建控制三维场景的UI交互界面，[详见](https://lil-gui.georgealways.com)
 
 ② 编辑器 https://threejs.org/editor/
-
-## [三维物体](https://threejs.org/docs/index.html#api/zh/core/Object3D)
-
-
 
 ## 几何体
 
@@ -400,8 +446,3 @@ window.addEventListener("dblclick", () => {
   const mesh = new THREE.Mesh(geometry, meshMaterial)
   ```
 
-### [4.3 常见几何体](https://threejs.org/docs/index.html#api/zh/geometries/BoxGeometry)
-
-## 材质
-
-## 贴图
