@@ -351,7 +351,17 @@ requestAnimationFrame
 
 ### 7.1 加载器
 
+模型加载器（GLTFLoader, OBJLoader）
+
+纹理加载器（TextureLoader）
+
+字体加载器（FontLoader）
+
 ### 7.2 资源
+
+加载进度管理
+
+错误处理
 
 ## 八、性能优化
 
