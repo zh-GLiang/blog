@@ -353,6 +353,10 @@ requestAnimationFrame
 
 模型加载器（GLTFLoader, OBJLoader）
 
+[GLTFLoader](https://threejs.org/docs/index.html#examples/zh/loaders/GLTFLoader)
+
+[OBJLoader](https://threejs.org/docs/index.html?q=OBJLoader#examples/zh/loaders/OBJLoader)
+
 纹理加载器（TextureLoader）
 
 字体加载器（FontLoader）
