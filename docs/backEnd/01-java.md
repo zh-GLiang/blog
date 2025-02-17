@@ -1510,3 +1510,270 @@ JDK8开始之后新增的时间API，都是不可变对象，修改后会返回�
 
 ### 4.13 Arrays
 
+用来操作数组的一个工具类。
+
+```java
+        // 1、public static String toString(类型[] arr)：返回数组的内容
+        int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        System.out.println(Arrays.toString(arr)); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+        // 2、public static 类型[] copyOfRange(类型[] arr,起始索引,结束索引)：拷贝数组（指定范围，包前不包后）
+        int[] arr2= Arrays.copyOfRange(arr, 0, 2);
+        System.out.println(Arrays.toString(arr2)); // [1, 2]
+
+        // 3、public static copyOf(类型[] arr,int newLength)：拷贝数组，可以指定新数组的长度，数组扩容,默认填充为0
+        int [] arr3 =Arrays.copyOf(arr2,10);
+        System.out.println(Arrays.toString(arr3));//[1, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        // 4、public static setAll(double[] array, IntToDoubleFunction generator)：把数组中的原数据改为新数据又存进去。
+        double[] prices={99.8,128,100};
+        Arrays.setAll(prices, new IntToDoubleFunction() {
+            @Override
+            public double applyAsDouble(int value) {
+                // value=0 1 2即索引
+                return prices[value]*0.8;
+            }
+        });
+        System.out.println(Arrays.toString(prices)); // [79.84, 102.4, 80.0]
+
+        // 5、public static void sort(类型[] arr)：对数组进行排序(默认是升序排序)
+        Arrays.sort(prices);
+        System.out.println(Arrays.toString(prices));// [79.84, 80.0, 102.4]
+```
+
+对于对象排序
+
+1、**排序方式1：**让Student类实现Comparable接口，同时重写compareTo方法。Arrays的sort方法底层会根据compareTo方法的返回值是正数、负数、还是0来确定谁大、谁小、谁相等。
+
+```java
+public class Student implements Comparable<Student>{
+    private String name;
+    private double height;
+    private int age;
+
+    // 排序方式1：让Student类实现Comparable接口，同时重写compareTo方法。Arrays的sort方法底层会根据compareTo方法的返回值是正数、负数、还是0来确定谁大、谁小、谁相等。
+    @Override
+    public int compareTo(Student o){
+        // 约定1：认为左边对象 大于 右边对象 请您返回正整数
+        // 约定2：认为左边对象 小于 右边对象 请您返回负整数
+        // 约定3：认为左边对象 等于 右边对象 请您一定返回0
+        // 按照年龄升序排序
+        return this.age - o.age;
+    }
+
+
+    public Student() {
+    }
+
+    public Student(String name, double height, int age) {
+        this.name = name;
+        this.height = height;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", height=" + height +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+输出
+
+```java
+public class ArraysTest2 {
+    public static void main(String[] args) {
+        Student[] students = new Student[4];
+        students[0]=new Student("张三",169.5,23);
+        students[1]=new Student("李四",163.8,26);
+        students[2]=new Student("王五",163.8,26);
+        students[3]=new Student("周六",167.5,24);
+        //排序方式1：让Student类实现Comparable接口，同时重写compareTo方法。Arrays的sort方法底层会根据compareTo方法的返回值是正数、负数、还是0来确定谁大、谁小、谁相等。
+        Arrays.sort(students);
+        System.out.println(Arrays.toString(students));
+    }
+}
+```
+
+排序方式2：在调用`Arrays.sort(数组,Comparator比较器);
+
+```java
+Arrays.sort(students, new Comparator<Student>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                // 指定比较规则-按照身高升序
+                return Double.compare(o1.getHeight(), o2.getHeight());
+            }
+        });
+        System.out.println(Arrays.toString(students));
+```
+
+### 4.14 Lambda表达式
+
+作用：用于简化匿名内部类代码的书写。格式类似js箭头函数
+
+函数式接口：
+
+1. 有且仅有一个抽象方法的接口
+2. 大部分函数式接口，上面都可能会有一个**@FunctionalInterface**的注解
+
+Lambda表达式的省略写法
+
+1. 参数类型可以省略不写
+2. 如果只有一个参数，参数类型可以省略，同时（）也可以省略
+3. 若Lambda表达式中的方法体代码只有一行代码，可以省略大括号，同时省略分号，如果这行代码是return语句，也必须去掉return
+
+```java
+Arrays.sort(students, new Comparator<Student>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                // 指定比较规则-按照身高升序
+                return Double.compare(o1.getHeight(), o2.getHeight());
+            }
+        });
+// Lambda简写
+Arrays.sort(students, (o1,o2)->  Double.compare(o1.getHeight(), o2.getHeight()));
+```
+
+### 4.15 方法引用
+
+- 静态方法的引用
+- 实例方法的引用
+- 特定方法的引用
+- 构造器引用
+
+## 五、常见算法
+
+### 5.1 排序算法
+
+#### 5.1.1冒泡排序
+
+每次从数组中找出最大值放在数组的后面去。
+
+```java
+public class Test1 {
+    public static void main(String[] args) {
+        // 1、准备一个数组
+        int[] arr = {5, 2, 3, 1};
+        // 2、定义一个循环控制几轮
+        for (int i = 0; i < arr.length-1; i++) {
+            // i = 0 1 2     [5,2,3,1]    次数
+            // i= 0 第一轮     0 1 2        3
+            // i= 1 第二轮     0 1          2
+            // i= 2 第三轮     0            1
+            for (int j = 0; j < arr.length - i - 1; j++) {
+            // 判断当前位置的元素值，是否大于后面一个位置元素值，如果大则交换
+                if (arr[j] > arr[j+1]) {
+                    int temp = arr[j+1];
+                    arr[j+1] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+        System.out.println(Arrays.toString(arr));// [1, 2, 3, 5]
+    }
+}
+```
+
+#### 5.1.2选择排序
+
+每轮选择当前位置，开始找出后面的较小值与该位置交换
+
+```java
+public class Test2 {
+    public static void main(String[] args) {
+        // 1、准备一个数组
+        int[] arr = {5, 2, 3, 1};
+        for (int i = 0; i < arr.length - 1; i++) {
+            // i = 0  第一轮  j = 1 2 3
+            // i = 1  第二轮  j = 2 3
+            // i = 2  第三轮  j = 3
+            int minIndex = i;
+            for (int j = i + 1; j < arr.length; j++) {
+                // 判断当前位置是否大于后面位置处的元素值，若大于则交换
+                if (arr[minIndex] > arr[j]) {
+                    minIndex = j;
+                }
+            }
+            if (i != minIndex) {
+                int temp = arr[i];
+                arr[i] = arr[minIndex];
+                arr[minIndex] = temp;
+            }
+        }
+        System.out.println(Arrays.toString(arr));// [1, 2, 3, 5]
+    }
+}
+```
+
+### 5.2 查找算法
+
+#### 5.2.1二分查找
+
+前提条件：数组中的数据必须是有序的
+
+```java
+public class Test3 {
+    public static void main(String[] args) {
+        // 1、准备号一个数组
+        int[] arr = {7, 23, 79, 81, 103, 127, 131, 147};
+        System.out.println(binarySearch(arr, 81));
+        System.out.println(Arrays.binarySearch(arr,81));
+    }
+
+    public static int binarySearch(int[] arr, int data) {
+        // 1、定义两个变量，一个左边位置，一个右边位置
+        int left = 0, right = arr.length - 1;
+        // 2、定义一个循环折半
+        while (left <= right) {
+            // 3、每次折半，都算出中间位置处的索引
+            int mid = (left + right) / 2;
+            // 4、判断当前要找的元素，与中间位置处的元素值的大小情况
+            if (data < arr[mid]) {
+                // 往左边找，截止位置（右边位置）=中间位置-1
+                right = mid - 1;
+            } else if (data > arr[mid]) {
+                // 往右边找，起始位置（左边位置）= 中间位置+1
+                left = mid + 1;
+            } else {
+                // 中间位置处的元素值，正好等于我们要找的元素值
+                return mid;
+            }
+        }
+        return -1;// 特殊结果，如代表没有找到数据，数组中不存在该数据
+    }
+}
+```
+
+## 六、正则表达式
+
+
+
