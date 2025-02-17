@@ -293,13 +293,17 @@ const plane = () => {
 
 ### 5.1 相机类型
 
-#### 5.1.2 透视投影[PerspectiveCamera](https://threejs.org/docs/index.html#api/zh/cameras/PerspectiveCamera)
+#### 5.1.2 透视相机[PerspectiveCamera](https://threejs.org/docs/index.html#api/zh/cameras/PerspectiveCamera)
 
 模拟人眼所看到的景象
 
-#### 5.1.2 正交投影[OrthographicCamera](https://threejs.org/docs/index.html#api/zh/cameras/OrthographicCamera)
+#### 5.1.2 正交相机[OrthographicCamera](https://threejs.org/docs/index.html#api/zh/cameras/OrthographicCamera)
 
 常用于图纸蓝图
+
+5.1.3 立方相机
+
+5.1.4 立体相机
 
 ### 5.2 相机控制
 
@@ -354,6 +358,8 @@ requestAnimationFrame
 模型加载器（GLTFLoader, OBJLoader）
 
 [GLTFLoader](https://threejs.org/docs/index.html#examples/zh/loaders/GLTFLoader)
+
+模型加载后遍历子节点
 
 [OBJLoader](https://threejs.org/docs/index.html?q=OBJLoader#examples/zh/loaders/OBJLoader)
 
