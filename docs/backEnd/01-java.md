@@ -36,6 +36,9 @@
    - `Ctrl + ALT + L` ：格式化代码
    - `Ctrl + /` ：单行注释
    - `Ctrl + Shift + /`：多行注释
+   - `alt + insert`：快速生成构造方法
+   - `sout + 回车`：创建输出方法
+   - `psvm + 回车`：创建mian方法
 
 7. Hello World
 
@@ -1734,7 +1737,7 @@ public class Test2 {
 }
 ```
 
-### 5.2 查找算法
+### 5.2查找算法
 
 #### 5.2.1二分查找
 
@@ -1787,10 +1790,121 @@ ctrl+all+t → try catch
 
 集合是一种容器，用来装数据的，类似于数组，但集合的大小可变，开发中常用
 
-### 8.1单列集合
+### 8.1 Collection
 
-每个元素只包含一个值
+`Collection`代表单列集合，每个元素只包含一个值
 
-### 8.2双列集合
+![](./images/01-3.png)
 
-每个元素包含两个值（键值对）
+#### 8.1.1 特点
+
+- List系列数组：添加的元素是有序、可重复、有索引
+  - `ArrayList`、`LinekdList`：有序、可重复、有索引
+- Set系列结合：添加的元素是无序、不重复、无索引
+  - `HashSet`：无序、不重复、无索引
+  - `LinkedHashSet`：有序、不重复、无索引
+  - `TreeSet`：按照大小默认升序排序、不重复、无索引
+
+#### 8.1.2 方法
+
+|               方法名称                |               说明               |
+| :-----------------------------------: | :------------------------------: |
+|       `public boolean add(E e)`       |   把给定的对象添加到当前集合中   |
+|         `public void clear()`         |       清空集合中所有的元素       |
+|     `public boolean remove(E e)`      |   把给定的对象在当前集合中删除   |
+| `public boolean contains(Object obj)` | 判断当前集合中是否包含给定的对象 |
+|      `public boolean isEmpty()`       |       判断当前集合是否为空       |
+|          `public int size()`          |       返回集合中元素的个数       |
+|      `public Object[] toArray()`      |   把集合中的元素，存储到数组中   |
+
+#### 8.1.3 遍历
+
+- 迭代器
+
+  ```java
+  public static void main(String[] args) {
+          Collection<String> c = new ArrayList<>();
+          c.add("张三");
+          c.add("李四");
+          c.add("王五");
+          c.add("赵六");
+          // 一、使用迭代器遍历集合
+          // 1、从集合中获取迭代器对象
+          Iterator<String> it = c.iterator();
+          // 2、使用循环结合迭代器遍历
+          while(it.hasNext()) {
+              // boolean hasNext() 询问当前位置是否有元素存在，存在返回true，不存在返回false
+              // E next()：获取当前元素
+              String ele = it.next();
+              System.out.println(ele);
+          }
+      }
+  ```
+
+- 增强for
+
+  ```java
+  // 二、使用增强for循环遍历集合或者数组 快捷键 c.for + 回车
+  for (String ele : c){
+  	System.out.println(ele);
+  }
+  ```
+
+- lambda表达式
+
+  ```java
+  c.forEach(s->{
+              System.out.println(s);
+          });
+  c.forEach(System.out::println);
+  ```
+
+#### 8.1.4 List
+
+`List`集合支持索引，也继承`Collection`功能
+
+|            方法名称             |                  说明                  |
+| :-----------------------------: | :------------------------------------: |
+| `void add(int index,E element)` |   在此集合中的指定位置插入指定的元素   |
+|      `E remove(int index)`      | 删除指定索引处的元素，返回被删除的元素 |
+|  `E set(int index,E element)`   | 修改指定索引处的元素，返回被修改的元素 |
+|       `E get(int index)`        |          返回指定索引处的元素          |
+
+```java
+    public static void main(String[] args) {
+        // 1、创建一个ArrayList集合对象（有序、可重复、有索引）
+        List<String> list = new ArrayList<>();
+        list.add("张三");
+        list.add("李四");
+        list.add("王五");
+        System.out.println(list); //[张三, 李四, 王五]
+
+        // 2、void add(int index,E element)：在某个索引位置插入元素
+        list.add(2,"赵六");
+        System.out.println(list); // [张三, 李四, 赵六, 王五]
+
+        // 3、E remove(int index)：删除指定索引处的元素，返回被删除的元素
+        list.remove(2);
+        System.out.println(list); // [张三, 李四, 王五]
+
+        // 4、E get(int index)：返回指定索引处的元素
+        System.out.println(list.get(0)); // 张三
+
+        // 5、E set(int index,E element)：修改指定索引处的元素，返回被修改的元素
+        list.set(0,"刘一");
+        System.out.println(list); //[刘一, 李四, 王五]
+    }
+```
+
+`List`集合遍历
+
+1. for循环（因为List集合有索引）
+2. 迭代器
+3. 增强for循环
+4. Lambda表达式
+
+#### 8.1.5 Set
+
+### 8.2 Map
+
+Map代表双列集合，每个元素包含两个值（键值对）
