@@ -1841,7 +1841,7 @@ ctrl+all+t → try catch
       }
   ```
 
-- 增强for
+- 增强for：底层使用迭代器实现
 
   ```java
   // 二、使用增强for循环遍历集合或者数组 快捷键 c.for + 回车
@@ -1959,13 +1959,140 @@ tip：链表：链表中的结点是独立的对象，在内存中是不连续�
 
 #### 8.1.5 Set
 
+`Set`要用到的常用方法，基本上就是`Collection`提供的
+
 `Set`系列集合特点：无序：添加数据的顺序和获取出的数据顺序不一致；  不重复； 无索引。
 
-`HashSet` : 无序、不重复、无索引。
+- `HashSet` : 无序、不重复、无索引。
+  - 底层原理：基于哈希表实现
+  - 不重复即对象哈希值不重复
+  - 如果希望Set集合认为2个内容一样的对象是重复的，必须重写对象的`hashCode()`和`equals()`方法
 
-`LinkedHashSet`：有序、不重复、无索引。
+- `LinkedHashSet`：有序、不重复、无索引。
+  - 基于哈希表(数组、链表、红黑树)实现的，但是，它的每个元素都额外的多了一个双链表的机制记录它前后元素的位置。
+  - <img src="./images/01-7.png" style="zoom: 25%;" />
 
-`TreeSet`：排序、不重复、无索引。
+- `TreeSet`：排序、不重复、无索引。
+
+  - 底层是基于红黑树实现的排序
+
+  - 默认升序排序 ，按照元素的大小，由小到大排序
+  - 对于数值类型：`Integer` , `Double`，默认按照数值本身的大小进行升序排序
+  - 对于字符串类型：默认按照首字符的编号升序排序
+  - 对于自定义对象，`TreeSet`默认是无法直接排序的
+  - 自定义排序规则：
+    - 方法一：让自定义的类实现`Comparable`接口，重写里面的`compareTo`方法来指定比较规则
+    - 方法二：通过调用TreeSet集合有参数构造器，可以设置`Comparator`对象（比较器对象，用于指定比较规则）
+
+tip：
+
+**哈希值**
+
+- 就是一个int类型的数值，Java中每个对象都有一个哈希值
+- `public int hashCode()`：返回对象的哈希码值
+- 同一个对象多次调用hashCode()方法返回的哈希值是相同的
+- 不同的对象，它们的哈希值一般不相同，但也有可能会相同(哈希碰撞)
+
+**哈希表**
+
+- 哈希表是一种增删改查数据，性能都较好的数据结构
+
+- JDK8之前，哈希表 = 数组+链表
+
+  <img src="./images/01-5.png" style="zoom: 25%;" />
+
+- JDK8开始，哈希表 = 数组+链表+红黑树
+
+  <img src="./images/01-6.png" style="zoom: 25%;" />
+
+#### 8.1.6 使用场景
+
+1. 记住元素的添加顺序，需要存储重复的元素，又要频繁的根据索引查询数据
+   - `ArrayList`集合（有序、可重复、有索引），底层基于数组的。（常用）
+2. 记住元素的添加顺序，且增删首尾数据的情况较多
+   - `LinkedList`集合（有序、可重复、有索引），底层基于双链表实现的
+3. 不在意元素顺序，也没有重复元素需要存储，只希望增删改查都快
+   - `HashSet`集合（无序，不重复，无索引），底层基于哈希表实现的。 （常用）
+4. 记住元素的添加顺序，也没有重复元素需要存储，且希望增删改查都快
+   - `LinkedHashSet`集合（有序，不重复，无索引）， 底层基于哈希表和双链表
+5. 对元素进行排序，也没有重复元素需要存储且希望增删改查都快
+   - `TreeSet`集合，基于红黑树实现
+
+#### 8.1.7 集合并发修改异常
+
+异常：
+
+- 使用迭代器遍历集合时，又同时在删除集合中的数据，程序就会出现并发修改异常的错误
+- 由于增强for循环遍历集合就是迭代器遍历集合的简化写法，因此，使用增强for循环遍历集合，又在同时删除集合中的数据时，程序也会出现并发修改异常的错误
+
+解决方法：
+
+- 增强for循环及`forEach`方法无法解决bug
+
+- 使用迭代器遍历集合，但用迭代器自己的删除`it.remove()`方法删除数据即可。
+
+  ```java
+  public static void main(String[] args) {
+          List<String> list = new ArrayList<>();
+          list.add("张三");
+          list.add("李四");
+          list.add("王五");
+          list.add("六李");
+          list.add("李七");
+          Iterator<String> it = list.iterator();
+          while (it.hasNext()) {
+              String name=it.next();
+              if(name.contains("李")){
+  //                list.remove(name); // 报错
+                  it.remove(); // 解决方法
+              }
+          }
+          System.out.println(list);
+      }
+  ```
+
+- 如果能用for循环遍历时：可以倒着遍历并删除；或者从前往后遍历，但删除元素后做`i--`操作
+
+  - `i--`操作
+
+    ```java
+    public static void main(String[] args) {
+            List<String> list = new ArrayList<>();
+            list.add("张三");
+            list.add("李四");
+            list.add("王五");
+            list.add("六李");
+            list.add("李七");
+            for (int i = 0; i < list.size(); i++) {
+               String name= list.get(i);
+                if(name.contains("李")){
+                    list.remove(name); // 不报错，但会漏删
+                    i--; // 解决方法
+                }
+            }
+            System.out.println(list);
+        }
+    ```
+
+  - 倒着遍历
+
+    ```java
+    public static void main(String[] args) {
+            List<String> list = new ArrayList<>();
+            list.add("张三");
+            list.add("李四");
+            list.add("王五");
+            list.add("六李");
+            list.add("李七");
+            for (int i = list.size() - 1; i >= 0; i--) {
+                String name = list.get(i);
+                if (name.contains("李")) {
+                    list.remove(name);
+                }
+            }
+            System.out.println(list);
+        }
+    ```
 
 ### 8.2 Map
 
