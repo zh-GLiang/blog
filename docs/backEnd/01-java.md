@@ -1903,7 +1903,69 @@ ctrl+all+t → try catch
 3. 增强for循环
 4. Lambda表达式
 
+```java
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("张三");
+        list.add("李四");
+        list.add("王五");
+        list.add("赵六");
+        // 1、for循环 快捷键list.fori
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            System.out.println(s);
+        }
+        
+        // 2、迭代器
+        Iterator<String> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            String s = iterator.next();
+            System.out.println(s);
+        }
+        
+        // 3、增强for循环
+        for (String s : list) {
+            System.out.println(s);
+        }
+        
+        // 4、lambda表达式
+        list.forEach(s -> {
+            System.out.println(s);
+        });
+        // list.forEach(System.out::println);
+    }
+```
+
+`ArrayList`与`LinkedList`底层原理
+
+- `ArrayList`集合的底层是基于数组实现的；适合：根据索引查询数据，比如根据随机索引取数据（高效）！或者数据量不是很大时；不适合：数据量大的同时，又要频繁的进行增删改查。
+
+- `LinkedList`基于双链表实现的，特点：查询慢，增删相对较快，但对首尾元素进行增删改查的速度是极快的。`LinkedList`新增了很多首尾操作的特有方法。应用场景：设计队列，设计栈。
+
+|           方法名称           |               说明               |
+| :--------------------------: | :------------------------------: |
+| `public void addFirst (E e)` |    在该列表开头插入指定的元素    |
+| `public void addLast (E e)`  |  将指定的元素追加到此列表的末尾  |
+|    `public E getFirst ()`    |     返回此列表中的第一个元素     |
+|    `public E getLast ()`     |    返回此列表中的最后一个元素    |
+|  `public E removeFirst ()`   |  从此列表中删除并返回第一个元素  |
+|   `public E removelast ()`   | 从此列表中删除并返回最后一个元素 |
+
+
+
+tip：链表：链表中的结点是独立的对象，在内存中是不连续的，每个结点包含数据值和下一个结点的地址；特点：查询慢，无论查询哪个数据都要从头开始找，链表增删相对快。
+
+![](./images/01-4.png)
+
 #### 8.1.5 Set
+
+`Set`系列集合特点：无序：添加数据的顺序和获取出的数据顺序不一致；  不重复； 无索引。
+
+`HashSet` : 无序、不重复、无索引。
+
+`LinkedHashSet`：有序、不重复、无索引。
+
+`TreeSet`：排序、不重复、无索引。
 
 ### 8.2 Map
 
