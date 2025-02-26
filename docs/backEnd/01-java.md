@@ -1796,7 +1796,7 @@ ctrl+all+t → try catch
 
 ![](./images/01-3.png)
 
-#### 8.1.1 特点
+#### 8.1.1 实现类
 
 - List系列数组：添加的元素是有序、可重复、有索引
   - `ArrayList`、`LinekdList`：有序、可重复、有索引
@@ -2094,6 +2094,83 @@ tip：
         }
     ```
 
+#### 8.1.8 Collections
+
+**可变参数**
+
+- 就是一种特殊形参，定义在方法、构造器的形参列表里，格式是：数据类型...参数名称
+- 可以不传数据给它；可以传一个或者同时传多个数据给它；也可以传一个数组给它
+- 可变参数在方法内部就是一个数组
+- 一个形参列表中可变参数只能有一个
+- 可变参数必须放在形参列表的最后面
+- <img src="./images/01-8.png"  />
+
+**`Collections`工具类常用静态方法**
+
+|                           方法名称                           |                        说明                        |
+| :----------------------------------------------------------: | :------------------------------------------------: |
+| `public static <T> boolean addAll(Collection<? super T> c, T... elements)` |                 给集合批量添加元素                 |
+|          `public static void shuffle(List<?> list)`          |              打乱List集合中的元素顺序              |
+|         `public static <T> void sort(List<T> list)`          |           对List集合中的元素进行升序排序           |
+| `public static <T> void sort(List<T> list，Comparator<? super T> c)` | 对List集合中元素，按照比较器对象指定的规则进行排序 |
+
+```java
+    public static void main(String[] args) {
+        // 1、public static <T> boolean addAll(Collection<? super T> c, T... elements)：给集合批量添加元素
+        List<String> list = new ArrayList<String>();
+        Collections.addAll(list, "张三", "李四", "王五");
+
+        // 2、public static void shuffle(List<?> list)：打乱List集合中的元素顺序
+        Collections.shuffle(list);
+
+        // 3、public static <T> void sort(List<T> list)：对List集合中的元素进行升序排序
+        List<Integer> list1 = new ArrayList<>();
+        Collections.addAll(list1, 2, 1, 4, 3, 5);
+        Collections.sort(list1);
+        System.out.println(list1);
+
+        // 4、public static <T> void sort(List<T> list，Comparator<? super T> c)：对List集合中元素，按照比较器对象指定的规则进行排序
+        List<Student> students = new ArrayList<>();
+        students.add(new Student("张三", 169.5, 23));
+        students.add(new Student("李四", 163.8, 26));
+        students.add(new Student("王五", 163.8, 26));
+        students.add(new Student("周六", 167.5, 24));
+        Collections.sort(students,(o1,o2)-> Double.compare(o1.getAge(), o2.getAge()));
+        System.out.println(students);
+    }
+```
+
 ### 8.2 Map
 
-Map代表双列集合，每个元素包含两个值（键值对）
+Map代表双列集合，每个元素包含两个值（键值对）,格式：{key1=value1 , key2=value2 , key3=value3 , ...}， 一次需要存一对数据做为一个元素,Map集合的所有键是不允许重复的，但值可以重复，键和值是一一对应的，每一个键只能找到自己对应的值
+
+<img src="./images/01-9.png"  />
+
+#### 8.2.1 实现类
+
+- `HashMap`（由键决定特点）: 无序、不重复、无索引；  （用的最多）
+
+- `LinkedHashMap` （由键决定特点）:由键决定的特点：有序、不重复、无索引
+
+- `TreeMap` （由键决定特点）:按照大小默认升序排序、不重复、无索引
+
+#### 8.2.2 方法
+
+|                   方法名称                   |                 说明                  |
+| :------------------------------------------: | :-----------------------------------: |
+|        `public V put(K key,V value)`         |               添加元素                |
+|             `public int size()`              |            获取集合的大小             |
+|            `public void clear()`             |               清空集合                |
+|          `public boolean isEmpty()`          | 判断集合是否为空，为空返回true , 反之 |
+|          `public V get(object key)`          |           根据键获取对应值            |
+|        `public V remove(Object key)`         |          根据键删除整个元素           |
+|  `public  boolean containsKey(Object key)`   |          判断是否包含某个键           |
+| `public boolean containsValue(Object value)` |          判断是否包含某个值           |
+|           `public Set<K> keySet()`           |           获取全部键的集合            |
+|       `public Collection<V> values()`        |          获取Map集合的全部值          |
+
+#### 8.2.3 遍历
+
+### 8.3 Stream流
+
+## 九、IO流
