@@ -1641,6 +1641,8 @@ Arrays.sort(students, new Comparator<Student>() {
 
 ### 4.14 Lambda表达式
 
+jdk8新增
+
 作用：用于简化匿名内部类代码的书写。格式类似js箭头函数
 
 函数式接口：
@@ -2144,15 +2146,18 @@ tip：
 
 Map代表双列集合，每个元素包含两个值（键值对）,格式：{key1=value1 , key2=value2 , key3=value3 , ...}， 一次需要存一对数据做为一个元素,Map集合的所有键是不允许重复的，但值可以重复，键和值是一一对应的，每一个键只能找到自己对应的值
 
-<img src="./images/01-9.png"  />
+<img src="./images/01-9.png" style="zoom: 67%;" />
 
 #### 8.2.1 实现类
 
 - `HashMap`（由键决定特点）: 无序、不重复、无索引；  （用的最多）
-
+  - HashMap跟HashSet的底层原理是一模一样的，都是基于哈希表实现的
+  - 原来学的Set系列集合的底层就是基于Map实现的，只是Set集合中的元素只要键数据，不要值数据而已
 - `LinkedHashMap` （由键决定特点）:由键决定的特点：有序、不重复、无索引
-
+  - 底层数据结构依然是基于哈希表实现的，只是每个键值对元素又额外的多了一个双链表的机制记录元素顺序(保证有序)
+  - 原来学习的LinkedHashSet集合的底层原理就是LinkedHashMap
 - `TreeMap` （由键决定特点）:按照大小默认升序排序、不重复、无索引
+  - TreeMap跟TreeSet集合的底层原理是一样的，都是基于红黑树实现的排序
 
 #### 8.2.2 方法
 
@@ -2171,6 +2176,70 @@ Map代表双列集合，每个元素包含两个值（键值对）,格式：{key
 
 #### 8.2.3 遍历
 
+- 键找值
+
+  ```java
+  public static void main(String[] args) {
+          Map<String, Double> map = new HashMap<>();
+          map.put("a", 1.0);
+          map.put("b", 2.0);
+          map.put("c", 3.0);
+          map.put("d", 4.0);
+          map.put("e", 5.0);
+          Set<String> keys = map.keySet();
+          for (String key : keys) {
+              double value = map.get(key);
+              System.out.println(key + "------" + value);
+          }
+      }
+  ```
+
+- 键值对
+
+  ```java
+  public static void main(String[] args) {
+          Map<String, Double> map = new HashMap<>();
+          map.put("a", 1.0);
+          map.put("b", 2.0);
+          map.put("c", 3.0);
+          map.put("d", 4.0);
+          map.put("e", 5.0);
+          // 把Map集合转换成键值对类型的set集合，快捷键： map.entrySet + ctrl + alt + v
+          Set<Map.Entry<String, Double>> entries = map.entrySet();
+          for (Map.Entry<String, Double> entry : entries) {
+              String key = entry.getKey();
+              Double value = entry.getValue();
+              System.out.println(key + ":" + value);
+          }
+      }
+  ```
+
+- Lambda表达式
+
+  ```java
+  public static void main(String[] args) {
+          Map<String, Double> map = new HashMap<>();
+          map.put("a", 1.0);
+          map.put("b", 2.0);
+          map.put("c", 3.0);
+          map.put("d", 4.0);
+          map.put("e", 5.0);
+          map.forEach((k, v) -> {
+              System.out.println(k + "=" + v);
+          });
+      }
+  ```
+
 ### 8.3 Stream流
+
+Stream流，是Jdk8开始新增的一套API ，可以用于操作集合或者数组的数据，结合了Lambda的语法风格来编程，提供了一种更加强大，更加简单的方式操作。
+
+使用步骤：
+
+<img src="./images/01-10.png" style="zoom: 67%;" />
+
+常用方法：
+
+
 
 ## 九、IO流
