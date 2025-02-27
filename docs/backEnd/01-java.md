@@ -2232,13 +2232,68 @@ Map代表双列集合，每个元素包含两个值（键值对）,格式：{key
 
 ### 8.3 Stream流
 
-Stream流，是Jdk8开始新增的一套API ，可以用于操作集合或者数组的数据，结合了Lambda的语法风格来编程，提供了一种更加强大，更加简单的方式操作。
+Stream流，是Jdk8开始新增的一套API ，可以用于操作**集合或者数组**的数据，结合了Lambda的语法风格来编程，提供了一种更加强大，更加简单的方式操作。
 
 使用步骤：
 
 <img src="./images/01-10.png" style="zoom: 67%;" />
 
-常用方法：
+1. 获取Stream流
+
+   - 获取集合的Stream流
+
+     `default Stream<E> stream()`：获取当前集合对象的Stream流
+
+   - 获取数组的Stream流
+
+     Arrays类提供的方法：`public static <T> Stream<T> stream(T[] array)`
+
+     Stream类提供的方法：`public static<T> Stream<T> of(T... values)`
+
+   - ```java
+     public static void main(String[] args) {
+             // 1、获取List集合的Stream流
+             List<String> list = new ArrayList<>();
+             Collections.addAll(list, "a", "b", "c", "d", "e", "f", "g", "h");
+             Stream<String> stream1 = list.stream();
+     
+             // 2、获取Set集合的Stream流
+             Set<String> set = new HashSet<>();
+             Collections.addAll(set, "a", "b", "c", "d", "e", "f", "g", "h");
+             Stream<String> stream2 = set.stream();
+     
+             // 3、获取Map集合的Stream流
+             Map<String, Double> map = new HashMap<>();
+             map.put("a", 1.0);
+             map.put("b", 2.0);
+             Set<Map.Entry<String, Double>> entries = map.entrySet();
+             Stream<Map.Entry<String, Double>> stream3 = entries.stream();
+     
+             // 4、获取数组的Stream流
+             String[] arr = {"a", "b", "c", "d", "e", "f", "g", "h"};
+             Stream<String> stream4 = Arrays.stream(arr);
+             Stream<String> stream5 = Stream.of(arr);
+         }
+     ```
+
+2. 常用中间方法
+
+   - |                  Stream提供的常用中间方法                   |               说明               |
+     | :---------------------------------------------------------: | :------------------------------: |
+     |     `Stream<T> filter(Predicate<? super T> predicate)`      |     用于对流中的数据进行过滤     |
+     |                    `Stream<T> sorted()`                     |        对元素进行升序排序        |
+     |    `Stream<T> sorted(Comparator<? super T> comparator)`     |         按照指定规则排序         |
+     |               `Stream<T> limit(long maxSize)`               |          获取前几个元素          |
+     |                  `Stream<T> skip(long n)`                   |          跳过前几个元素          |
+     |                   `Stream<T> distinct()`                    |        去除流中重复的元素        |
+     | `<R> Stream<R> map(Function<? super T,? extends R> mapper)` | 对元素进行加工，并返回对应的新流 |
+     |      `static <T> Stream<T> concat(Stream a, Stream b)`      |      合并a和b两个流为一个流      |
+
+     
+
+   - 2
+
+3. 终结方法
 
 
 
