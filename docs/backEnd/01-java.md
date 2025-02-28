@@ -2278,6 +2278,8 @@ Stream流，是Jdk8开始新增的一套API ，可以用于操作**集合或者�
 
 2. 常用中间方法
 
+   中间方法指的是调用完成后会返回新的Stream流，可以继续使用(支持链式编程)
+
    - |                  Stream提供的常用中间方法                   |               说明               |
      | :---------------------------------------------------------: | :------------------------------: |
      |     `Stream<T> filter(Predicate<? super T> predicate)`      |     用于对流中的数据进行过滤     |
@@ -2289,12 +2291,101 @@ Stream流，是Jdk8开始新增的一套API ，可以用于操作**集合或者�
      | `<R> Stream<R> map(Function<? super T,? extends R> mapper)` | 对元素进行加工，并返回对应的新流 |
      |      `static <T> Stream<T> concat(Stream a, Stream b)`      |      合并a和b两个流为一个流      |
 
+   - ```java
+     public static void main(String[] args) {
+             List<Double> scores = new ArrayList<>();
+             Collections.addAll(scores, 88.5, 100.0, 60.0, 99.0, 9.5, 99.6, 25.0);
+             // 需求1：找出成绩大于等于60分的数据，升序后再输出
+             scores.stream().filter(s -> s > 60).sorted().forEach(System.out::println);
      
+             List<Student> students = new ArrayList<>();
+             Student s1 = new Student("张三", 26, 172.5);
+             Student s2 = new Student("李四", 26, 172.5);
+             Student s3 = new Student("王五", 23, 167.6);
+             Student s4 = new Student("赵六", 25, 169.8);
+             Student s5 = new Student("孙七", 35, 183.3);
+             Student s6 = new Student("周八", 34, 168.5);
+             Collections.addAll(students, s1, s2, s3, s4, s5, s6);
+             // 需求2：找出年龄大于等于23，且年龄小于等于30岁的学生，并按照年龄降序验出。Stream提供的常用中间方法
+             students.stream().filter(s -> s.getAge() >= 23 && s.getAge() <= 30).sorted(((o1, o2) -> o2.getAge() - o1.getAge())).forEach(System.out::println);
+             // 需求3：找出身高最高的前3名学生，并输出
+             students.stream().sorted((o1, o2) -> Double.compare(o2.getHeight(), o1.getHeight())).limit(3).forEach(System.out::println);
+             // 需求4：找出身高倒数的2名学生，并输出
+             students.stream().sorted((o1, o2) -> Double.compare(o2.getHeight(), o1.getHeight())).skip(students.size() - 2).forEach(System.out::println);
+             // 需求5：找出身高超过168的学生四什么名宇，要求去除重复的名字，再输出。
+             students.stream().filter(s -> s.getHeight() >= 168).map(Student::getName).distinct().forEach(System.out::println);
+         }
+     ```
 
-   - 2
+3. 终结方法(获取结果)
 
-3. 终结方法
+   终结方法指的是调用完成后，不会返回新Stream了，没法继续使用流了
 
+   |                   Stream提供的常用终结方法                   |                   说明                   |
+   | :----------------------------------------------------------: | :--------------------------------------: |
+   |               `void forEach(Consumer action)`                |        对此流运算后的元素执行遍历        |
+   |                        `long count()`                        |         统计此流运算后的元素个数         |
+   |     `Optional<T> max(Comparator<? super T> comparator)`      |        获取此流运算后的最大值元素        |
+   |     `Optional<T> min(Comparator<? super T> comparator)`      |        获取此流运算后的最小值元素        |
+   |               `R collect(Collector collector)`               | 把流处理后的结果收集到一个指定的集合中去 |
+   |                     `Object[] toArray()`                     |    把流处理后的结果收集到一个数组中去    |
+   |            `public static <T> Collector toList()`            |          把元素收集到List集合中          |
+   |            `public static <T> Collector toSet()`             |          把元素收集到Set集合中           |
+   | `public static  Collector toMap(Function keyMapper , Function valueMapper)` |          把元素收集到Map集合中           |
 
+   ```java
+   public static void main(String[] args) {
+           List<Student> students = new ArrayList<>();
+           Student s1 = new Student("张三", 26, 172.5);
+           Student s2 = new Student("李四", 26, 172.5);
+           Student s3 = new Student("王五", 23, 167.6);
+           Student s4 = new Student("赵六", 25, 169.8);
+           Student s5 = new Student("孙七", 35, 183.3);
+           Student s6 = new Student("周八", 34, 168.5);
+           Collections.addAll(students, s1, s2, s3, s4, s5, s6);
+           // 需求1：请计算出身高超过168的学生有几人。
+           Long size = students.stream().filter(s -> s.getHeight() > 168).count();
+           System.out.println(size);
+           // 需求2：请找出身高最高的学生对象，并输出。
+           Student s = students.stream().max(((o1, o2) -> Double.compare(o1.getHeight(), o2.getHeight()))).get();
+           System.out.println(s);
+           // 需求3：请找出身高最矮的学生对象，并输出。
+           Student ss = students.stream().min(((o1, o2) -> Double.compare(o1.getHeight(), o2.getHeight()))).get();
+           System.out.println(ss);
+           // 需求4：请找出身高超过170的学生对象，并放到一个新集合中去返回。
+           List<Student> students1 = students.stream().filter(a -> a.getHeight() > 170).collect(Collectors.toList());
+           System.out.println(students1);
+           Set<Student> students2 = students.stream().filter(a -> a.getHeight() > 170).collect(Collectors.toSet());
+           System.out.println(students2);
+           // 需求5：请找出身高超过170的学生对象，并把学生对象的名字和身高，存入到一个Map集合返回，需指定键值对
+           Map<String, Double> students3 = students.stream().filter(a -> a.getHeight() > 170).distinct().collect(Collectors.toMap(Student::getName, Student::getHeight));
+           System.out.println(students3);
+       	// 存入数组
+           Student[] students4 = students.stream().filter(a -> a.getHeight() > 170).toArray(Student[]::new);
+           System.out.println(Arrays.toString(students4));
+       }
+   ```
 
-## 九、IO流
+## 九、File、IO流
+
+File是java.io.包下的类， File类的对象，用于代表当前操作系统的文件（可以是文件、或文件夹）,File类只能对文件本身进行操作，不能读写文件里面存储的数据。
+
+IO流用于读写数据的（可以读写文件，或网络中的数据…)
+
+File：代表文本，IO流：读写数据
+
+### 9.1 File
+
+9.1.1 创建对象
+
+9.1.2 判断文件类型、获取文件信息
+
+9.1.3 遍历文件夹
+
+### 9.2 IO流
+
+## 十、多线程
+
+## 十一、网络通信
+
+## 十二、Java高级
