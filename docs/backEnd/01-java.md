@@ -2242,4 +2242,68 @@ Stream流，是Jdk8开始新增的一套API ，可以用于操作集合或者数
 
 
 
-## 九、IO流
+## 九、File、IO流
+
+File是java.io.包下的类， File类的对象，用于代表当前操作系统的文件（可以是文件、或文件夹）,File类只能对文件本身进行操作，不能读写文件里面存储的数据。
+
+IO流用于读写数据的（可以读写文件，或网络中的数据…)
+
+File：代表文本，IO流：读写数据
+
+### 9.1 File
+
+#### 9.1.1 创建对象
+
+```java
+public class Test1 {
+    public static void main(String[] args) {
+        // 获取文件夹/文件，也可以指代不存在的文件路径
+        File file = new File("D:/test.txt");
+        // 关于不同系统分隔符
+        // File file = new File("D:"+File.separator+"test.txt");
+        System.out.println(file.length());// 获取文件大小，单位字节
+        // 不带盘符，默认从工程下寻找文件
+        File file1 = new File("demo\\src\\com\\file\\Test1.java");
+        System.out.println(file1.length());
+    }
+}
+```
+
+#### 9.1.2 判断文件类型、获取文件信息
+
+```java
+public static void main(String[] args) {
+    // 1、创建文件对象，指代某个文件
+        File file = new File("D:/test.txt");
+    // 2、public boolean exists()	判断当前文件对象，对应的文件路径是否存在，存在返回true
+        System.out.println(file.exists());
+    // 3、public boolean isFile()	判断当前文件对象指代的是否是文件，是文件返回true，反之。
+        System.out.println(file.isFile());
+    // 4、public boolean isDirectory()	判断当前文件对象指代的是否是文件夹，是文件夹返回true，反之。
+        System.out.println(file.isDirectory());
+    // 5、public String getName()	获取文件的名称（包含后缀）
+        System.out.println(file.getName());
+    // 6、public long length()	获取文件的大小，返回字节个数
+        System.out.println(file.length());
+    // 7、public long lastModified()	获取文件的最后修改时间。返回时间毫秒
+        long time = file.lastModified();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(sdf.format(time));
+    // 8、public String getPath()	获取创建文件对象时，使用的路径
+        System.out.println(file.getPath());
+    // 9、public String getAbsolutePath()	获取绝对路径
+        System.out.println(file.getAbsolutePath());
+}
+```
+
+#### 9.1.3 创建文件、删除文件
+
+#### 9.1.4 遍历文件夹
+
+### 9.2 IO流
+
+## 十、多线程
+
+## 十一、网络通信
+
+## 十二、Java高级
