@@ -1,12 +1,14 @@
-# SpringBootWeb
+# SpringBoot
 
 [spring](https://spring.io/)发展到今天已经形成了一种开发生态圈，Spring提供了若干个子项目，每个项目用于完成特定的功能。而我们在项目开发时，一般会偏向于选择这一套spring家族的技术，来解决对应领域的问题，那我们称这一套技术为spring全家桶。Spring家族旗下这么多的技术，最基础、最核心的是 SpringFramework，其他的spring家族的技术，都是基于SpringFramework的。
 
 通过springboot可以快速的帮我们构建应用程序
 
-## 一、快速入门
+## 一、项目创建
 
 **需求**：基于SpringBoot的方式开发一个web应用，浏览器发起请求/hello后，给浏览器返回字符串“Hello World ~”
+
+### 1.1 自动创建
 
 **开发步骤**
 
@@ -20,9 +22,147 @@
 
 3. 测试运行
 
-​	浏览器输入`http://localhost:8080/hello`
+​	点击运行，浏览器输入`http://localhost:8080/hello`
 
-## 二、HTTP协议
+### 1.2 手动创建
+
+## 二、配置文件
+
+properties 是传统的配置格式，而 YAML是更简洁的结构化配置格式，两者核心功能一致，spring Boot 默认识别`src/main/resources/application.yml`（核心配置文件），优先级高于`application.properties`（若同时存在，YAML 会覆盖 properties 同键配置）。
+
+### 2.1 properties配置文件
+
+文件地址：`src/main/resources/application.properties`
+
+[官方配置文档地址](https://docs.spring.io/spring-boot/appendix/application-properties/index.html#appendix.application-properties)
+
+**场景案例：**
+
+- #### 配置 Spring Boot 核心参数
+
+  Spring Boot 内置了大量自动配置（AutoConfiguration），而 properties 文件可以覆盖 / 定制这些默认行为
+
+  ```sh
+  # 服务器端口（默认8080）
+  server.port=8081
+  # 应用上下文路径
+  server.servlet.context-path=/demo
+  # 编码格式
+  server.tomcat.uri-encoding=UTF-8
+  # 日志级别
+  logging.level.org.springframework=INFO
+  logging.level.com.example.demo=DEBUG
+  ```
+
+- #### 自定义业务配置
+
+  开发者可以在配置文件中定义业务相关的参数，比如接口地址、超时时间、开关等，代码中通过注解读取
+
+- #### 环境差异化配置
+
+  支持多环境配置（通过`spring.profiles.active`指定激活环境）开发环境、生产环境
+
+- #### 配置第三方组件
+
+  整合的所有第三方组件（数据库、Redis、MQ、MyBatis 等），都可以通过 properties 配置
+
+### 2.2 yaml配置文件
+
+文件地址：`src/main/resources/application.yaml`
+
+备注：文件结尾为.yaml或.yml
+
+YAML 的核心是**缩进 + 键值对 + 结构化**
+
+**场景案例：**
+
+- 配置 Spring Boot 核心参数
+
+  ```yaml
+  # 服务器配置
+  server:
+    port: 8081  # 端口（对应properties：server.port=8081）
+    servlet:
+      context-path: /demo  # 上下文路径（对应server.servlet.context-path=/demo）
+    tomcat:
+      uri-encoding: UTF-8  # 编码
+  
+  # 日志配置
+  logging:
+    level:
+      org.springframework: INFO  # Spring框架日志级别
+      com.example.demo: DEBUG   # 自定义包日志级别
+  ```
+
+- 配置第三方组件（数据库、Redis 等）
+
+  ```yaml
+  # 数据源配置（MySQL）
+  spring:
+    datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/test?useSSL=false&serverTimezone=UTC
+      username: root
+      password: 123456
+  
+  # Redis配置
+    redis:
+      host: localhost
+      port: 6379
+      password:  # 空密码
+      database: 0
+      timeout: 5000ms  # 超时时间（支持单位：ms/s/m/h/d）
+  ```
+
+- 配置数组 / 集合（YAML 天然支持)
+
+- 多环境差异化配置（激活指定环境)
+
+  ##### 拆分多个 YAML 文件
+
+  开发环境：`application-dev.yml`
+
+  测试环境：`application-test.yml`
+
+  生产环境：`application-prod.yml`
+
+  在主配置`application.yml`中指定激活的环境：
+
+  ```yaml
+  spring:
+    profiles:
+      active: prod  # 激活生产环境（改为dev则用开发环境配置）
+  ```
+
+- 代码中读取 YAML 配置（和 properties 一致）
+
+  ```java
+  // @Value 读取单个配置
+  public class AppConfig {
+      // 读取简单配置
+      @Value("${server.port}")
+      private Integer port;
+  
+      // 读取数组（需用逗号分隔，YAML数组会自动转为逗号分隔的字符串）
+      @Value("${app.allowed-ips}")
+      private String[] allowedIps;
+  
+      // 读取带默认值的配置（配置不存在时用默认值）
+      @Value("${app.retry-count:3}")
+      private Integer retryCount;
+  }
+  
+  // @ConfigurationProperties 批量绑定
+  // 开启配置绑定（prefix指定YAML中的前缀）
+  @ConfigurationProperties(prefix = "server")
+  public class AppConfig {
+      private Integer port;
+  }
+  ```
+
+### 2.3 整合mybatis
+
+## HTTP协议
 
 ### 2.1 概述
 
@@ -92,7 +232,7 @@ HTTP：Hyper Text Transfer Protocol(超文本传输协议)，规定了浏览器�
 
 ### 2.4 协议解析
 
-## 三、请求响应
+## 请求响应
 
 ### 3.1 请求
 
