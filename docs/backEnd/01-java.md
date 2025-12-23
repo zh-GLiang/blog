@@ -2232,15 +2232,139 @@ Map代表双列集合，每个元素包含两个值（键值对）,格式：{key
 
 ### 8.3 Stream流
 
-Stream流，是Jdk8开始新增的一套API ，可以用于操作集合或者数组的数据，结合了Lambda的语法风格来编程，提供了一种更加强大，更加简单的方式操作。
+Stream流，是Jdk8开始新增的一套API ，可以用于操作**集合或者数组**的数据，结合了Lambda的语法风格来编程，提供了一种更加强大，更加简单的方式操作。
 
 使用步骤：
 
 <img src="./images/01-10.png" style="zoom: 67%;" />
 
-常用方法：
+1. 获取Stream流
 
+   - 获取集合的Stream流
 
+     `default Stream<E> stream()`：获取当前集合对象的Stream流
+
+   - 获取数组的Stream流
+
+     Arrays类提供的方法：`public static <T> Stream<T> stream(T[] array)`
+
+     Stream类提供的方法：`public static<T> Stream<T> of(T... values)`
+
+   - ```java
+     public static void main(String[] args) {
+             // 1、获取List集合的Stream流
+             List<String> list = new ArrayList<>();
+             Collections.addAll(list, "a", "b", "c", "d", "e", "f", "g", "h");
+             Stream<String> stream1 = list.stream();
+     
+             // 2、获取Set集合的Stream流
+             Set<String> set = new HashSet<>();
+             Collections.addAll(set, "a", "b", "c", "d", "e", "f", "g", "h");
+             Stream<String> stream2 = set.stream();
+     
+             // 3、获取Map集合的Stream流
+             Map<String, Double> map = new HashMap<>();
+             map.put("a", 1.0);
+             map.put("b", 2.0);
+             Set<Map.Entry<String, Double>> entries = map.entrySet();
+             Stream<Map.Entry<String, Double>> stream3 = entries.stream();
+     
+             // 4、获取数组的Stream流
+             String[] arr = {"a", "b", "c", "d", "e", "f", "g", "h"};
+             Stream<String> stream4 = Arrays.stream(arr);
+             Stream<String> stream5 = Stream.of(arr);
+         }
+     ```
+
+2. 常用中间方法
+
+   中间方法指的是调用完成后会返回新的Stream流，可以继续使用(支持链式编程)
+
+   - |                  Stream提供的常用中间方法                   |               说明               |
+     | :---------------------------------------------------------: | :------------------------------: |
+     |     `Stream<T> filter(Predicate<? super T> predicate)`      |     用于对流中的数据进行过滤     |
+     |                    `Stream<T> sorted()`                     |        对元素进行升序排序        |
+     |    `Stream<T> sorted(Comparator<? super T> comparator)`     |         按照指定规则排序         |
+     |               `Stream<T> limit(long maxSize)`               |          获取前几个元素          |
+     |                  `Stream<T> skip(long n)`                   |          跳过前几个元素          |
+     |                   `Stream<T> distinct()`                    |        去除流中重复的元素        |
+     | `<R> Stream<R> map(Function<? super T,? extends R> mapper)` | 对元素进行加工，并返回对应的新流 |
+     |      `static <T> Stream<T> concat(Stream a, Stream b)`      |      合并a和b两个流为一个流      |
+
+   - ```java
+     public static void main(String[] args) {
+             List<Double> scores = new ArrayList<>();
+             Collections.addAll(scores, 88.5, 100.0, 60.0, 99.0, 9.5, 99.6, 25.0);
+             // 需求1：找出成绩大于等于60分的数据，升序后再输出
+             scores.stream().filter(s -> s > 60).sorted().forEach(System.out::println);
+     
+             List<Student> students = new ArrayList<>();
+             Student s1 = new Student("张三", 26, 172.5);
+             Student s2 = new Student("李四", 26, 172.5);
+             Student s3 = new Student("王五", 23, 167.6);
+             Student s4 = new Student("赵六", 25, 169.8);
+             Student s5 = new Student("孙七", 35, 183.3);
+             Student s6 = new Student("周八", 34, 168.5);
+             Collections.addAll(students, s1, s2, s3, s4, s5, s6);
+             // 需求2：找出年龄大于等于23，且年龄小于等于30岁的学生，并按照年龄降序验出。Stream提供的常用中间方法
+             students.stream().filter(s -> s.getAge() >= 23 && s.getAge() <= 30).sorted(((o1, o2) -> o2.getAge() - o1.getAge())).forEach(System.out::println);
+             // 需求3：找出身高最高的前3名学生，并输出
+             students.stream().sorted((o1, o2) -> Double.compare(o2.getHeight(), o1.getHeight())).limit(3).forEach(System.out::println);
+             // 需求4：找出身高倒数的2名学生，并输出
+             students.stream().sorted((o1, o2) -> Double.compare(o2.getHeight(), o1.getHeight())).skip(students.size() - 2).forEach(System.out::println);
+             // 需求5：找出身高超过168的学生四什么名宇，要求去除重复的名字，再输出。
+             students.stream().filter(s -> s.getHeight() >= 168).map(Student::getName).distinct().forEach(System.out::println);
+         }
+     ```
+
+3. 终结方法(获取结果)
+
+   终结方法指的是调用完成后，不会返回新Stream了，没法继续使用流了
+
+   |                   Stream提供的常用终结方法                   |                   说明                   |
+   | :----------------------------------------------------------: | :--------------------------------------: |
+   |               `void forEach(Consumer action)`                |        对此流运算后的元素执行遍历        |
+   |                        `long count()`                        |         统计此流运算后的元素个数         |
+   |     `Optional<T> max(Comparator<? super T> comparator)`      |        获取此流运算后的最大值元素        |
+   |     `Optional<T> min(Comparator<? super T> comparator)`      |        获取此流运算后的最小值元素        |
+   |               `R collect(Collector collector)`               | 把流处理后的结果收集到一个指定的集合中去 |
+   |                     `Object[] toArray()`                     |    把流处理后的结果收集到一个数组中去    |
+   |            `public static <T> Collector toList()`            |          把元素收集到List集合中          |
+   |            `public static <T> Collector toSet()`             |          把元素收集到Set集合中           |
+   | `public static  Collector toMap(Function keyMapper , Function valueMapper)` |          把元素收集到Map集合中           |
+
+   ```java
+   public static void main(String[] args) {
+           List<Student> students = new ArrayList<>();
+           Student s1 = new Student("张三", 26, 172.5);
+           Student s2 = new Student("李四", 26, 172.5);
+           Student s3 = new Student("王五", 23, 167.6);
+           Student s4 = new Student("赵六", 25, 169.8);
+           Student s5 = new Student("孙七", 35, 183.3);
+           Student s6 = new Student("周八", 34, 168.5);
+           Collections.addAll(students, s1, s2, s3, s4, s5, s6);
+           // 需求1：请计算出身高超过168的学生有几人。
+           Long size = students.stream().filter(s -> s.getHeight() > 168).count();
+           System.out.println(size);
+           // 需求2：请找出身高最高的学生对象，并输出。
+           Student s = students.stream().max(((o1, o2) -> Double.compare(o1.getHeight(), o2.getHeight()))).get();
+           System.out.println(s);
+           // 需求3：请找出身高最矮的学生对象，并输出。
+           Student ss = students.stream().min(((o1, o2) -> Double.compare(o1.getHeight(), o2.getHeight()))).get();
+           System.out.println(ss);
+           // 需求4：请找出身高超过170的学生对象，并放到一个新集合中去返回。
+           List<Student> students1 = students.stream().filter(a -> a.getHeight() > 170).collect(Collectors.toList());
+           System.out.println(students1);
+           Set<Student> students2 = students.stream().filter(a -> a.getHeight() > 170).collect(Collectors.toSet());
+           System.out.println(students2);
+           // 需求5：请找出身高超过170的学生对象，并把学生对象的名字和身高，存入到一个Map集合返回，需指定键值对
+           Map<String, Double> students3 = students.stream().filter(a -> a.getHeight() > 170).distinct().collect(Collectors.toMap(Student::getName, Student::getHeight));
+           System.out.println(students3);
+       	// 存入数组
+           Student[] students4 = students.stream().filter(a -> a.getHeight() > 170).toArray(Student[]::new);
+           System.out.println(Arrays.toString(students4));
+       }
+   ```
 
 ## 九、File、IO流
 
@@ -2252,53 +2376,11 @@ File：代表文本，IO流：读写数据
 
 ### 9.1 File
 
-#### 9.1.1 创建对象
+9.1.1 创建对象
 
-```java
-public class Test1 {
-    public static void main(String[] args) {
-        // 获取文件夹/文件，也可以指代不存在的文件路径
-        File file = new File("D:/test.txt");
-        // 关于不同系统分隔符
-        // File file = new File("D:"+File.separator+"test.txt");
-        System.out.println(file.length());// 获取文件大小，单位字节
-        // 不带盘符，默认从工程下寻找文件
-        File file1 = new File("demo\\src\\com\\file\\Test1.java");
-        System.out.println(file1.length());
-    }
-}
-```
+9.1.2 判断文件类型、获取文件信息
 
-#### 9.1.2 判断文件类型、获取文件信息
-
-```java
-public static void main(String[] args) {
-    // 1、创建文件对象，指代某个文件
-        File file = new File("D:/test.txt");
-    // 2、public boolean exists()	判断当前文件对象，对应的文件路径是否存在，存在返回true
-        System.out.println(file.exists());
-    // 3、public boolean isFile()	判断当前文件对象指代的是否是文件，是文件返回true，反之。
-        System.out.println(file.isFile());
-    // 4、public boolean isDirectory()	判断当前文件对象指代的是否是文件夹，是文件夹返回true，反之。
-        System.out.println(file.isDirectory());
-    // 5、public String getName()	获取文件的名称（包含后缀）
-        System.out.println(file.getName());
-    // 6、public long length()	获取文件的大小，返回字节个数
-        System.out.println(file.length());
-    // 7、public long lastModified()	获取文件的最后修改时间。返回时间毫秒
-        long time = file.lastModified();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(sdf.format(time));
-    // 8、public String getPath()	获取创建文件对象时，使用的路径
-        System.out.println(file.getPath());
-    // 9、public String getAbsolutePath()	获取绝对路径
-        System.out.println(file.getAbsolutePath());
-}
-```
-
-#### 9.1.3 创建文件、删除文件
-
-#### 9.1.4 遍历文件夹
+9.1.3 遍历文件夹
 
 ### 9.2 IO流
 

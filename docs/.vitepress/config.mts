@@ -85,7 +85,7 @@ export default defineConfig({
           items: [
             { text: "Java", link: "/backEnd/01-java" },
             { text: "maven", link: "/backEnd/02-maven" },
-            { text: "spring", link: "/backEnd/03-spring" }
+            { text: "springBoot", link: "/backEnd/03-spring" }
           ]
         }
       ]
